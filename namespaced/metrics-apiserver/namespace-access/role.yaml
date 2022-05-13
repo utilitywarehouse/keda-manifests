@@ -1,0 +1,17 @@
+# This role should be assigned to the keda-metrics-apiserver service account when using triggerauthentications in a namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/name: keda-metrics-apiserver
+    app.kubernetes.io/part-of: keda-operator
+  name: keda-metrics-apiserver
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
