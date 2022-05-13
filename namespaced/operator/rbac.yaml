@@ -27,9 +27,7 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - external
       - pods
-      - secrets
       - services
     verbs:
       - get
