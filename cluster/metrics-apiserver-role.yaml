@@ -14,3 +14,18 @@ rules:
       - scaledobjects/status
     verbs:
       - '*'
+  - apiGroups:
+      - keda.sh
+    resources:
+      - triggerauthentications
+      - triggerauthentications/status
+    verbs:
+      - '*'
+  - apiGroups:
+      - keda.sh
+    resources:
+      - scaledjobs
+      - scaledjobs/finalizers
+      - scaledjobs/status
+    verbs:
+      - '*'
