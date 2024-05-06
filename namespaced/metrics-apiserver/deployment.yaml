@@ -30,6 +30,12 @@ metadata:
     app.kubernetes.io/part-of: keda-operator
     app.kubernetes.io/version: 2.6.1
   name: keda-metrics-apiserver
+  annotations:
+    "app.uw.systems/description": "Kubernetes event-driven autoscaler API server."
+    "app.uw.systems/tier": "tier_2"
+    "app.uw.systems/repos.keda-manifests": "https://github.com/utilitywarehouse/keda-manifests/namespaced/metrics-apiserver"
+    "app.uw.systems/tags.oss": "true"
+    "app.uw.systems/tags.skip-repo": "true"
 spec:
   replicas: 1
   selector:
@@ -89,8 +95,8 @@ spec:
               name: temp-vol
       nodeSelector:
         kubernetes.io/os: linux
-#      securityContext:
-#        runAsNonRoot: true
+      #      securityContext:
+      #        runAsNonRoot: true
       serviceAccountName: keda-metrics-apiserver
       volumes:
         - emptyDir: {}
