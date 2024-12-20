@@ -12,10 +12,41 @@ rules:
       - clustertriggerauthentications
       - clustertriggerauthentications/status
     verbs:
-      - '*'
+      - get
+      - list
+      - patch
+      - update
+      - watch
   - apiGroups:
-      - coordination.k8s.io
+      - eventing.keda.sh
     resources:
-      - leases
+      - clustercloudeventsources
+      - clustercloudeventsources/status
     verbs:
-      - '*'
+      - get
+      - list
+      - patch
+      - update
+      - watch
+# TODO [SB] do we actually need these? They appeared in newer version.
+#  At least validatingwebhookconfigurations is for validating the resources
+#  - apiGroups:
+#      - apiregistration.k8s.io
+#    resources:
+#      - apiservices
+#    verbs:
+#      - get
+#      - list
+#      - patch
+#      - update
+#      - watch
+#  - apiGroups:
+#      - admissionregistration.k8s.io
+#    resources:
+#      - validatingwebhookconfigurations
+#    verbs:
+#      - get
+#      - list
+#      - patch
+#      - update
+#      - watch
