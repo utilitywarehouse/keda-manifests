@@ -4,19 +4,19 @@ metadata:
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/path: /metrics
-    prometheus.io/port: "80"
+    prometheus.io/port: "8080"
   labels:
     app.kubernetes.io/name: keda-metrics-apiserver
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.6.1
+    app.kubernetes.io/version: 2.16.0
   name: keda-metrics-apiserver
 spec:
   ports:
     - name: https
       port: 443
       targetPort: 6443
-    - name: http
-      port: 80
+    - name: metrics
+      port: 8080
       targetPort: 8080
   selector:
     app: keda-metrics-apiserver
@@ -28,7 +28,7 @@ metadata:
     app: keda-metrics-apiserver
     app.kubernetes.io/name: keda-metrics-apiserver
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.6.1
+    app.kubernetes.io/version: 2.16.0
   name: keda-metrics-apiserver
   annotations:
     "app.uw.systems/description": "Kubernetes event-driven autoscaler API server."
@@ -52,13 +52,22 @@ spec:
             - /usr/local/bin/keda-adapter
             - --secure-port=6443
             - --logtostderr=true
+            - --stderrthreshold=ERROR
             - --v=0
+            - --client-ca-file=/certs/ca.crt
+            - --tls-cert-file=/certs/tls.crt
+            - --tls-private-key-file=/certs/tls.key
+            - --cert-dir=/certs
           env:
             - name: WATCH_NAMESPACE
               value: ""
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: KEDA_HTTP_DEFAULT_TIMEOUT
               value: ""
-          image: ghcr.io/kedacore/keda-metrics-apiserver:2.6.1
+          image: ghcr.io/kedacore/keda-metrics-apiserver:2.16.0
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -90,14 +99,25 @@ spec:
             capabilities:
               drop:
                 - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           volumeMounts:
             - mountPath: /tmp
               name: temp-vol
+            - mountPath: /certs
+              name: certificates
+              readOnly: true
       nodeSelector:
         kubernetes.io/os: linux
-      #      securityContext:
-      #        runAsNonRoot: true
+      securityContext:
+        runAsNonRoot: true
       serviceAccountName: keda-metrics-apiserver
       volumes:
         - emptyDir: {}
           name: temp-vol
+        - name: certificates
+          secret:
+            defaultMode: 420
+            secretName: keda-metrics-apiserver-cert
