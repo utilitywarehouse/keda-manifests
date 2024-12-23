@@ -26,7 +26,7 @@ metadata:
     app.kubernetes.io/component: operator
     app.kubernetes.io/name: keda-operator
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.6.1
+    app.kubernetes.io/version: 2.16.0
   name: keda-operator
   annotations:
     "app.uw.systems/description": "Kubernetes event-driven autoscaler API operator."
@@ -51,14 +51,20 @@ spec:
             - --leader-elect
             - --zap-log-level=info
             - --zap-encoder=console
+            - --zap-time-encoding=rfc3339
+            - --enable-cert-rotation=false
           command:
             - /keda
           env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: WATCH_NAMESPACE
               value: "TBD"
             - name: KEDA_HTTP_DEFAULT_TIMEOUT
               value: ""
-          image: ghcr.io/kedacore/keda:2.6.1
+          image: ghcr.io/kedacore/keda:2.16.0
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -91,9 +97,22 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /certs
+              name: certificates
+              readOnly: true
       nodeSelector:
         kubernetes.io/os: linux
-      #      securityContext:
-      #        runAsNonRoot: true
+      securityContext:
+        runAsNonRoot: true
       serviceAccountName: keda-operator
       terminationGracePeriodSeconds: 10
+      volumes:
+        - name: certificates
+          secret:
+            defaultMode: 420
+            optional: true
+            secretName: keda-operator-cert

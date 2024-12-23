@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: keda-operator
+spec:
+  commonName: dev-enablement/keda-operator
+  dnsNames:
+    - keda-operator.dev-enablement
+  duration: 168h0m0s # 7 days, renews 2/3 of the way through
+  issuerRef:
+    kind: ClusterIssuer
+    name: keda-selfsigned-issuer
+  secretName: keda-operator-cert
