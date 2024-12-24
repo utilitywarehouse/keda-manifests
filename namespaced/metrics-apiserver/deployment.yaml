@@ -122,4 +122,4 @@ spec:
         - name: certificates
           secret:
             defaultMode: 420
-            secretName: keda-metrics-apiserver-cert
+            secretName: kedaorg-certs

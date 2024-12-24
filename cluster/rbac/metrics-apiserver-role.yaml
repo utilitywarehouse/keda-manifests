@@ -23,3 +23,15 @@ rules:
       - patch
       - update
       - watch
+# todo [sb]: needed when operator generates its own certificate
+  - apiGroups:
+      - authorization.k8s.io
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - update
+      - watch
