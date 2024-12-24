@@ -60,7 +60,7 @@ spec:
             - --cert-dir=/certs
           env:
             - name: WATCH_NAMESPACE
-              value: ""
+              value: "TBD"
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
