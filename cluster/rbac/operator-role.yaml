@@ -28,24 +28,25 @@ rules:
       - patch
       - update
       - watch
-# TODO [SB] these are needed when the operator generates the certificates on its own
-  - apiGroups:
-      - apiregistration.k8s.io
-    resources:
-      - apiservices
-    verbs:
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - admissionregistration.k8s.io
-    resources:
-      - validatingwebhookconfigurations
-    verbs:
-      - get
-      - list
-      - patch
-      - update
-      - watch
+# TODO [SB] do we actually need these? They appeared in newer version.
+#  At least validatingwebhookconfigurations is for validating the resources
+#  - apiGroups:
+#      - apiregistration.k8s.io
+#    resources:
+#      - apiservices
+#    verbs:
+#      - get
+#      - list
+#      - patch
+#      - update
+#      - watch
+#  - apiGroups:
+#      - admissionregistration.k8s.io
+#    resources:
+#      - validatingwebhookconfigurations
+#    verbs:
+#      - get
+#      - list
+#      - patch
+#      - update
+#      - watch

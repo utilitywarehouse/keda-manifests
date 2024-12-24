@@ -55,7 +55,7 @@ spec:
             - --zap-log-level=info
             - --zap-encoder=console
             - --zap-time-encoding=rfc3339
-            - --enable-cert-rotation=true
+            - --enable-cert-rotation=false
           command:
             - /keda
           env:
@@ -120,5 +120,4 @@ spec:
           secret:
             defaultMode: 420
             optional: true
-            secretName: kedaorg-certs
-
+            secretName: keda-operator-cert

@@ -17,22 +17,11 @@ rules:
   - apiGroups:
       - ""
     resources:
-      - secrets
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  - apiGroups:
-      - ""
-    resources:
       - configmaps
       - configmaps/status
       - external
       - pods
+      - secrets
       - services
     verbs:
       - get
