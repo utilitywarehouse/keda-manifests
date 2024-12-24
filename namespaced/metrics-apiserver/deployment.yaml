@@ -67,6 +67,8 @@ spec:
                   fieldPath: metadata.namespace
             - name: KEDA_HTTP_DEFAULT_TIMEOUT
               value: ""
+            - name: KEDA_RESTRICT_SECRET_ACCESS
+              value: "true"
           image: ghcr.io/kedacore/keda-metrics-apiserver:2.16.0
           imagePullPolicy: Always
           livenessProbe:

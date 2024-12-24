@@ -6,13 +6,16 @@ metadata:
     prometheus.io/path: /metrics
     prometheus.io/port: "8080"
   labels:
-    app.kubernetes.io/component: operator
+    app.kubernetes.io/name: keda-operator
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.6.1
+    app.kubernetes.io/version: 2.16.0
   name: keda-operator
 spec:
   ports:
-    - name: http
+    - name: metricsservice
+      port: 9666
+      targetPort: 9666
+    - name: metrics
       port: 8080
       targetPort: 8080
   selector:
@@ -64,6 +67,8 @@ spec:
               value: "TBD"
             - name: KEDA_HTTP_DEFAULT_TIMEOUT
               value: ""
+            - name: KEDA_RESTRICT_SECRET_ACCESS
+              value: "true"
           image: ghcr.io/kedacore/keda:2.16.0
           imagePullPolicy: Always
           livenessProbe:
