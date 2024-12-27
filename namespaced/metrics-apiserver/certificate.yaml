@@ -3,11 +3,9 @@ kind: Certificate
 metadata:
   name: keda-metrics-apiserver
 spec:
-  commonName: dev-enablement/keda-metrics-apiserver
-  dnsNames:
-    - keda-metrics-apiserver.dev-enablement
-    - keda-metrics-apiserver.dev-enablement.svc.cluster.local
-    - keda-metrics-apiserver.dev-enablement.svc
+  commonName: keda-metrics-apiserver
+  dnsNames: []
+#    - keda-metrics-apiserver.${ns}.svc
   duration: 168h0m0s # 7 days, renews 2/3 of the way through
   issuerRef:
     kind: ClusterIssuer
