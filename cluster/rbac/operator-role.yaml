@@ -109,8 +109,7 @@ rules:
       - update
       - watch
 
-# TODO [SB] do we actually need these? They appeared in newer version.
-#  At least validatingwebhookconfigurations is for validating the resources
+# We don't need this when running with our own certs, otherwise it needs access to be able to update the ca bundle on the APIservice & Validating Webhook.
 #  - apiGroups:
 #      - apiregistration.k8s.io
 #    resources:
