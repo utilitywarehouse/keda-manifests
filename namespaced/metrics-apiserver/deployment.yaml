@@ -115,7 +115,7 @@ spec:
         kubernetes.io/os: linux
       securityContext:
         runAsNonRoot: true
-      serviceAccountName: keda-metrics-apiserver
+      serviceAccountName: keda-operator
       volumes:
         - emptyDir: {}
           name: temp-vol
