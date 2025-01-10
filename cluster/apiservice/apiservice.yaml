@@ -1,0 +1,20 @@
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  annotations:
+    # This needs to be set to the namespace where the certificate will be applied, like kube-system
+    cert-manager.io/inject-ca-from: ${ns}/keda-apiservice-cert
+  labels:
+    app.kubernetes.io/name: v1beta1.external.metrics.k8s.io
+    app.kubernetes.io/part-of: keda-operator
+    app.kubernetes.io/version: 2.16.1
+  name: v1beta1.external.metrics.k8s.io
+spec:
+  group: external.metrics.k8s.io
+  groupPriorityMinimum: 100
+  service:
+    name: keda-metrics-apiserver
+    # This needs to be set to the namespace where the keda operator will be applied, like dev-enablement
+    namespace: ${operator-ns}
+  version: v1beta1
+  versionPriority: 100
