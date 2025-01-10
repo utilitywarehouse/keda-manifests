@@ -55,7 +55,7 @@ spec:
             - --zap-log-level=info
             - --zap-encoder=console
             - --zap-time-encoding=rfc3339
-            - --enable-cert-rotation=false
+            - --enable-cert-rotation=true
           command:
             - /keda
           env:
@@ -105,10 +105,10 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-          volumeMounts:
-            - mountPath: /certs
-              name: certificates
-              readOnly: true
+#          volumeMounts:
+#            - mountPath: /certs
+#              name: certificates
+#              readOnly: true
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:

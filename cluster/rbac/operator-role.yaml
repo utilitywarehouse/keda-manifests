@@ -110,23 +110,23 @@ rules:
       - watch
 
 # We don't need this when running with our own certs, otherwise it needs access to be able to update the ca bundle on the APIservice & Validating Webhook.
-#  - apiGroups:
-#      - apiregistration.k8s.io
-#    resources:
-#      - apiservices
-#    verbs:
-#      - get
-#      - list
-#      - patch
-#      - update
-#      - watch
-#  - apiGroups:
-#      - admissionregistration.k8s.io
-#    resources:
-#      - validatingwebhookconfigurations
-#    verbs:
-#      - get
-#      - list
-#      - patch
-#      - update
-#      - watch
+  - apiGroups:
+      - apiregistration.k8s.io
+    resources:
+      - apiservices
+    verbs:
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingwebhookconfigurations
+    verbs:
+      - get
+      - list
+      - patch
+      - update
+      - watch
