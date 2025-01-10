@@ -108,9 +108,9 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: temp-vol
-#            - mountPath: /certs
-#              name: certificates
-#              readOnly: true
+            - mountPath: /certs
+              name: certificates
+              readOnly: true
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
