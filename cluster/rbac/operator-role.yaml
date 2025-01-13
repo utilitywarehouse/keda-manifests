@@ -139,5 +139,5 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: keda-operator
-    # The namespace needs to be specified upon instantiation
-    namespace: TBD
+    # Running the operator from the dev-enablement namespace
+    namespace: dev-enablement
