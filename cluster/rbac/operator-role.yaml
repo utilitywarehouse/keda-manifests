@@ -1,3 +1,8 @@
+# We did the following changes to the default cluster role:
+#  - removed the access to apiregistration.k8s.io/apiservices and admissionregistration.k8s.io/validatingwebhookconfigurations as those are needed for updating the cabundle when keda is responsible for managing the TLS assets. In our case we're using our own cert manager to do this.
+#  - removed the global access to secrets
+#  - removed the generic get from all resources
+#  - added access to subjectaccessreviews as seems the metrics API server needs it.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -119,25 +124,3 @@ rules:
       - patch
       - update
       - watch
-
-# We don't need this when running with our own certs, otherwise it needs access to be able to update the ca bundle on the APIservice & Validating Webhook.
-#  - apiGroups:
-#      - apiregistration.k8s.io
-#    resources:
-#      - apiservices
-#    verbs:
-#      - get
-#      - list
-#      - patch
-#      - update
-#      - watch
-#  - apiGroups:
-#      - admissionregistration.k8s.io
-#    resources:
-#      - validatingwebhookconfigurations
-#    verbs:
-#      - get
-#      - list
-#      - patch
-#      - update
-#      - watch
