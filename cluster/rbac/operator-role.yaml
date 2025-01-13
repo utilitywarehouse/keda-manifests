@@ -108,6 +108,17 @@ rules:
       - patch
       - update
       - watch
+  - apiGroups:
+      - authorization.k8s.io
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+      - get
+      - list
+      - patch
+      - update
+      - watch
 
 # We don't need this when running with our own certs, otherwise it needs access to be able to update the ca bundle on the APIservice & Validating Webhook.
 #  - apiGroups:
