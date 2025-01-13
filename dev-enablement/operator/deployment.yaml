@@ -8,7 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: keda-operator
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: keda-operator
 spec:
   ports:
@@ -29,7 +29,7 @@ metadata:
     app.kubernetes.io/component: operator
     app.kubernetes.io/name: keda-operator
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: keda-operator
   annotations:
     "app.uw.systems/description": "Kubernetes event-driven autoscaler API operator."
@@ -69,7 +69,7 @@ spec:
               value: ""
             - name: KEDA_RESTRICT_SECRET_ACCESS
               value: "true"
-          image: ghcr.io/kedacore/keda:2.16.0
+          image: ghcr.io/kedacore/keda:2.16.1
           imagePullPolicy: Always
           livenessProbe:
             httpGet:

@@ -8,7 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: keda-metrics-apiserver
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: keda-metrics-apiserver
 spec:
   ports:
@@ -28,7 +28,7 @@ metadata:
     app: keda-metrics-apiserver
     app.kubernetes.io/name: keda-metrics-apiserver
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: keda-metrics-apiserver
   annotations:
     "app.uw.systems/description": "Kubernetes event-driven autoscaler API server."
@@ -69,7 +69,7 @@ spec:
               value: ""
             - name: KEDA_RESTRICT_SECRET_ACCESS
               value: "true"
-          image: ghcr.io/kedacore/keda-metrics-apiserver:2.16.0
+          image: ghcr.io/kedacore/keda-metrics-apiserver:2.16.1
           imagePullPolicy: Always
           livenessProbe:
             httpGet:

@@ -5,7 +5,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: cloudeventsources.eventing.keda.sh
 spec:
   group: eventing.keda.sh
@@ -164,7 +164,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: clustercloudeventsources.eventing.keda.sh
 spec:
   group: eventing.keda.sh
@@ -321,7 +321,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: clustertriggerauthentications.keda.sh
 spec:
   group: keda.sh
@@ -889,7 +889,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: scaledjobs.keda.sh
 spec:
   group: keda.sh
@@ -9474,7 +9474,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: scaledobjects.keda.sh
 spec:
   group: keda.sh
@@ -9882,7 +9882,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.16.0
+    app.kubernetes.io/version: 2.16.1
   name: triggerauthentications.keda.sh
 spec:
   group: keda.sh
