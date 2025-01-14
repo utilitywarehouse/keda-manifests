@@ -16,7 +16,6 @@ rules:
     resources:
       - secrets
     verbs:
-      - get
       - list
       - watch
 ---
