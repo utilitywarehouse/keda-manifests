@@ -13,9 +13,9 @@ Both components will run from the `dev-enablement` namespace
 
 ### RBAC adjustments 
 [Keda releases](https://github.com/kedacore/keda/releases) include:
-- a `keda-operator` [cluster role](kube-system/rbac/operator-role.yaml) with cluster wide permissions used for watching over other namespaces. 
+- a `keda-operator` [cluster role](kube-system/rbac/operator-cluster-role.yaml) with cluster wide permissions used for watching over other namespaces. 
   The permissions in it are quite well curated nowadays, but we went forward and adjusted it more. These adjustments are documented at the beginning of the file.  
-- a `keda-operator` role used for accessing local `dev-enablement` resources
+- a slim `keda-operator` [role](dev-enablement/rbac/operator-role.yaml) used for accessing local `dev-enablement` resources. We adjusted this one too documented also at the beginning of the file.
 - a `keda-operator` service account that is bound to these roles
 Both by the metrics API server and the operator run with this service account.
 
