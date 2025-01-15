@@ -4,26 +4,22 @@ Based on the manifests from [Keda releases](https://github.com/kedacore/keda/rel
 
 ## Structure
 The high level structure is as follows:
-- `/cluster` folder - contains cluster level resources that can only be applied by cluster admins. They must be reviewed by the system team.
-- `/namespaced` folder - contains the resources that can be deployed in regular namespaces and can be applied by namespace admins.
+- `/kube-system` - contains cluster level resources that can only be applied by cluster admins in the kube-system namespace. They must be reviewed by the system team.
+- `/dev-enablement` - contains the resources that can be applied by namespace admins. The default namespace where keda runs is "dev-enablement"
 
 ## Components
-Considering our Kubernetes cluster setup we'll deploy:
-- the metrics server can only be one per cluster, as it needs to register as an
-  [APIService](https://github.com/utilitywarehouse/kubernetes-manifests/blob/master/dev-merit/kube-system/keda/metrics-api-service.yaml)
-  that handles external metrics. Until wider adoption, this sits in a normal namespace like billing.
-- until wider adoption the operator will be deployed in each namespace that wants to leverage Keda.
+Keda runs nowadays as a single operator instance + single metrics API server per cluster, that watch over other selected namespaces.
+Both components will run from the `dev-enablement` namespace
 
-### RBAC split
-At the moment of writing this doc, [Keda releases](https://github.com/kedacore/keda/releases) come with a single global role and a single service account that is used both by the metrics server and by the operator and the permissions are quite loose.
+### RBAC adjustments 
+[Keda releases](https://github.com/kedacore/keda/releases) include:
+- a `keda-operator` [cluster role](kube-system/rbac/operator-role.yaml) with cluster wide permissions used for watching over other namespaces. 
+  The permissions in it are quite well curated nowadays, but we went forward and adjusted it more. These adjustments are documented at the beginning of the file.  
+- a `keda-operator` role used for accessing local `dev-enablement` resources
+- a `keda-operator` service account that is bound to these roles
+Both by the metrics API server and the operator run with this service account.
 
-For adapting the RBAC to our clusters, we split it into several pieces:
-- the metrics api server will run under the `service account` [keda-metrics-apiserver](https://github.com/utilitywarehouse/keda-manifests/blob/main/namespaced/metrics-apiserver/rbac.yaml#L2)
-- the operator in each namespace will run under the `service account` [keda-operator](https://github.com/utilitywarehouse/keda-manifests/blob/main/namespaced/operator/rbac.yaml#L2) 
-- the `cluster role` [keda-operator](https://github.com/utilitywarehouse/keda-manifests/blob/main/cluster/operator-role.yaml#L2) should be bound to each `keda-operator` service account for accessing cluster wide resources.  
-- the `role` [keda-operator](https://github.com/utilitywarehouse/keda-manifests/blob/main/namespaced/operator/rbac.yaml#L10) is [bound](https://github.com/utilitywarehouse/keda-manifests/blob/main/namespaced/operator/rbac.yaml#L92) to each `keda-operator` service account for accessing namespaced resources.  
-- the `cluster role` [keda-metrics-apiserver](https://github.com/utilitywarehouse/keda-manifests/blob/main/cluster/metrics-apiserver-role.yaml#L2) is bound to the `keda-metrics-apiserver` service account for accessing cluster wide keda objects.
-- the `cluster role` [keda-external-metrics-reader](https://github.com/utilitywarehouse/keda-manifests/blob/main/cluster/hpa-rbac.yaml#L2) bound to the existing `horizontal-pod-autoscaler` service account for HPA to be able to access external metrics exposed by the keda metrics-apiserver. This is kept as is from the released keda manifests 
+Although the metrics API doesn't need all the permissions in these roles, we want to keep the manifests as close as possible to Keda upstream, to have a leaner upgrade experience.
 
 ### Secrets limitation
 Using scalers with any means of [authentication through secrets](https://keda.sh/docs/2.7/concepts/authentication/) is `NOT SUPPORTED`. 
