@@ -1,2 +1,2 @@
-/cluster/        @utilitywarehouse/system
-/namespaced/     @utilitywarehouse/finance-platform
+/kube-system/        @utilitywarehouse/system
+/dev-enablement/     @utilitywarehouse/dev-enablement-services
