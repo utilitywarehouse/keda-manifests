@@ -40,7 +40,10 @@ We took the scaledjobs.keda.sh Custom Resource Definition out of the manifests.
 If you have a good use case for it please contact us.
 
 ### Secrets limitation
-Using scalers with any means of [authentication through secrets](https://keda.sh/docs/2.7/concepts/authentication/) is `NOT SUPPORTED`. 
+We are running with [restricting Keda access to secrets](https://keda.sh/docs/2.16/operate/cluster/#restrict-secret-access).
+
+This means that using scalers that use any flavor of [authentication through secrets](https://keda.sh/docs/2.16/concepts/authentication/) requires giving Keda access to the secrets in your namespace.
+
 
 #### Explanation
 In its default RBAC configuration, Keda gives `cluster wide access` for its components to `secrets`. 

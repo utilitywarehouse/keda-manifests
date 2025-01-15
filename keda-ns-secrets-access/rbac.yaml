@@ -1,0 +1,32 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/name: keda-operator-ns-secrets-access
+    app.kubernetes.io/part-of: keda-operator
+  name: keda-operator-ns-secrets-access
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: keda-operator
+    app.kubernetes.io/part-of: keda-operator
+  name: keda-operator-ns-secrets-access
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: keda-operator-ns-secrets-access
+subjects:
+  - kind: ServiceAccount
+    name: keda-operator
+    namespace: dev-enablement
