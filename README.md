@@ -11,6 +11,17 @@ The high level structure is as follows:
 Keda runs nowadays as a single operator instance + single metrics API server per cluster, that watch over other selected namespaces.
 Both components will run from the `dev-enablement` namespace
 
+### TLS 
+Keda uses TLS certificates, and we're managing those TLS assets on our own using cert-manager.
+
+Here are [their docs on this](https://keda.sh/docs/2.16/operate/security/#use-your-own-tls-certificates).
+
+Implementation details:
+- [defined custom cert manager issuer](kube-system/clusterissuer/clusterissuer.yaml). This is the issuer used for all the Keda self-signed certificates.
+- [defined certificate](dev-enablement/metrics-apiserver/certificate.yaml) for metrics-apiserver. The generated secret is [mounted in the pod](https://github.com/utilitywarehouse/keda-manifests/blob/264e3e5d3cf8285f7b2c1e17b1e23141a20c0903/dev-enablement/metrics-apiserver/deployment.yaml#L111-L125). 
+- [defined certificate](dev-enablement/operator/certificate.yaml) for the operator. We're running with [disabled certificate rotation](https://github.com/utilitywarehouse/keda-manifests/blob/264e3e5d3cf8285f7b2c1e17b1e23141a20c0903/dev-enablement/operator/deployment.yaml#L58) and the generated secret is [mounted in the pod](https://github.com/utilitywarehouse/keda-manifests/blob/264e3e5d3cf8285f7b2c1e17b1e23141a20c0903/dev-enablement/operator/deployment.yaml#L108-L123)
+- [defined certificate](kube-system/apiservice/certificate.yaml) for the API Service. The `cabundle` in the API service is set by using the annotation [cert-manager.io/inject-ca-from](https://github.com/utilitywarehouse/keda-manifests/blob/264e3e5d3cf8285f7b2c1e17b1e23141a20c0903/kube-system/apiservice/apiservice.yaml#L6)
+
 ### RBAC adjustments 
 [Keda releases](https://github.com/kedacore/keda/releases) include:
 - a `keda-operator` [cluster role](kube-system/rbac/operator-cluster-role.yaml) with cluster wide permissions used for watching over other namespaces. 
