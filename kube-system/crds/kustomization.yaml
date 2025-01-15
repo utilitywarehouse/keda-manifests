@@ -3,3 +3,11 @@ kind: Kustomization
 resources:
   - crds.yaml
 
+patches:
+  # Due to https://github.com/kedacore/keda/issues/4740, removing, the scaledjobs.keda.sh CRD
+  - patch: |-
+      $patch: delete
+      apiVersion: apiextensions.k8s.io/v1
+      kind: CustomResourceDefinition
+      metadata:
+        name: scaledjobs.keda.sh

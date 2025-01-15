@@ -32,6 +32,13 @@ Both by the metrics API server and the operator run with this service account.
 
 Although the metrics API doesn't need all the permissions in these roles, we want to keep the manifests as close as possible to Keda upstream, to have a leaner upgrade experience.
 
+### SclaledJobs limitation
+Due to [this bug](https://github.com/kedacore/keda/issues/4740) we currently don't support [scaling jobs](https://keda.sh/docs/2.16/concepts/scaling-jobs/).
+
+We took the scaledjobs.keda.sh Custom Resource Definition out of the manifests.
+
+If you have a good use case for it please contact us.
+
 ### Secrets limitation
 Using scalers with any means of [authentication through secrets](https://keda.sh/docs/2.7/concepts/authentication/) is `NOT SUPPORTED`. 
 
