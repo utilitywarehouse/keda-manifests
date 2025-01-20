@@ -67,8 +67,9 @@ spec:
               value: "TBD"
             - name: KEDA_HTTP_DEFAULT_TIMEOUT
               value: ""
+            # Do not restrict secrets access, as this is given on demand for needing namespaces
             - name: KEDA_RESTRICT_SECRET_ACCESS
-              value: "true"
+              value: "false"
           image: ghcr.io/kedacore/keda:2.16.1
           imagePullPolicy: Always
           livenessProbe:
