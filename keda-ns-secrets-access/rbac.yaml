@@ -11,6 +11,13 @@ rules:
     resources:
       - secrets
     verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
       - get
     resourceNames:
       # individual secrets should be listed in kustomization
