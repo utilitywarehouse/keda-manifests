@@ -12,8 +12,9 @@ rules:
       - secrets
     verbs:
       - get
-      - list
-      - watch
+    resourceNames:
+      # individual secrets should be listed in kustomization
+      - TBD
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
