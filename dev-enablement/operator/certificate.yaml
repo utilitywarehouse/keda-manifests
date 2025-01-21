@@ -7,7 +7,7 @@ spec:
   dnsNames:
     # Running the operator from the dev-enablement namespace
     - keda-operator.dev-enablement.svc.cluster.local
-  duration: 168h0m0s # 7 days, renews 2/3 of the way through
+  duration: 2160h0m0s # 90 days, renews 2/3 of the way through
   issuerRef:
     kind: ClusterIssuer
     name: keda-selfsigned-issuer
