@@ -44,10 +44,31 @@ By default, Keda's RBAC configuration grants `cluster-wide access` to `secrets` 
 This approach is incompatible with our cluster setup, as it undermines our namespace isolation strategy and introduces significant security risks. 
 Consequently, we've stripped away this default access. However, we are **not** currently applying [restricted access to secrets](https://keda.sh/docs/2.16/operate/cluster/#restrict-secret-access) in our environment.
 
-To use scalers that require [authentication through secrets](https://keda.sh/docs/2.16/concepts/authentication/), Keda needs access to the secrets within your namespace. 
-To enable this, please apply the base [keda-ns-secrets-access](/keda-ns-secrets-access) in your namespace.
-
-Alternatively, you can utilize a Prometheus exporter to expose required metrics as Prometheus metrics while managing the necessary authentication. You can then employ the Prometheus scaler, which does not require additional authentication.  
+To use scalers that require [authentication through secrets](https://keda.sh/docs/2.16/concepts/authentication/), Keda needs access to the used secrets within your namespace. 
+To enable this, please apply the base [keda-ns-secrets-access](/keda-ns-secrets-access) in your namespace and patch through kustomize the role `keda-operator-ns-secrets-access` where you list the secrets used by Keda scalers. 
+Example:
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: keda-operator-ns-secrets-access
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+    resourceNames:
+      - test-keda-secret
+```
 
 ## Upgrade procedure
 Due to the RBAC split, the upgrade is not straight forward.
