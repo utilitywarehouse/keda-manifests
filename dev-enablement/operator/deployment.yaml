@@ -6,13 +6,16 @@ metadata:
     prometheus.io/path: /metrics
     prometheus.io/port: "8080"
   labels:
-    app.kubernetes.io/component: operator
+    app.kubernetes.io/name: keda-operator
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.6.1
+    app.kubernetes.io/version: 2.16.1
   name: keda-operator
 spec:
   ports:
-    - name: http
+    - name: metricsservice
+      port: 9666
+      targetPort: 9666
+    - name: metrics
       port: 8080
       targetPort: 8080
   selector:
@@ -26,7 +29,7 @@ metadata:
     app.kubernetes.io/component: operator
     app.kubernetes.io/name: keda-operator
     app.kubernetes.io/part-of: keda-operator
-    app.kubernetes.io/version: 2.6.1
+    app.kubernetes.io/version: 2.16.1
   name: keda-operator
   annotations:
     "app.uw.systems/description": "Kubernetes event-driven autoscaler API operator."
@@ -51,14 +54,23 @@ spec:
             - --leader-elect
             - --zap-log-level=info
             - --zap-encoder=console
+            - --zap-time-encoding=rfc3339
+            - --enable-cert-rotation=false
           command:
             - /keda
           env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: WATCH_NAMESPACE
               value: "TBD"
             - name: KEDA_HTTP_DEFAULT_TIMEOUT
               value: ""
-          image: ghcr.io/kedacore/keda:2.6.1
+            # Do not restrict secrets access, as this is given on demand for needing namespaces
+            - name: KEDA_RESTRICT_SECRET_ACCESS
+              value: "false"
+          image: ghcr.io/kedacore/keda:2.16.1
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -91,9 +103,22 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /certs
+              name: certificates
+              readOnly: true
       nodeSelector:
         kubernetes.io/os: linux
-      #      securityContext:
-      #        runAsNonRoot: true
+      securityContext:
+        runAsNonRoot: true
       serviceAccountName: keda-operator
       terminationGracePeriodSeconds: 10
+      volumes:
+        - name: certificates
+          secret:
+            defaultMode: 420
+            optional: true
+            secretName: keda-operator-cert

@@ -4,51 +4,79 @@ Based on the manifests from [Keda releases](https://github.com/kedacore/keda/rel
 
 ## Structure
 The high level structure is as follows:
-- `/cluster` folder - contains cluster level resources that can only be applied by cluster admins. They must be reviewed by the system team.
-- `/namespaced` folder - contains the resources that can be deployed in regular namespaces and can be applied by namespace admins.
+- `/kube-system` - contains cluster level resources that can only be applied by cluster admins in the kube-system namespace. They must be reviewed by the system team.
+- `/dev-enablement` - contains the resources that can be applied by namespace admins. The default namespace where keda runs is "dev-enablement"
 
 ## Components
-Considering our Kubernetes cluster setup we'll deploy:
-- the metrics server can only be one per cluster, as it needs to register as an
-  [APIService](https://github.com/utilitywarehouse/kubernetes-manifests/blob/master/dev-merit/kube-system/keda/metrics-api-service.yaml)
-  that handles external metrics. Until wider adoption, this sits in a normal namespace like billing.
-- until wider adoption the operator will be deployed in each namespace that wants to leverage Keda.
+Keda runs nowadays as a single operator instance + single metrics API server per cluster, that watch over other selected namespaces.
+Both components will run from the `dev-enablement` namespace
 
-### RBAC split
-At the moment of writing this doc, [Keda releases](https://github.com/kedacore/keda/releases) come with a single global role and a single service account that is used both by the metrics server and by the operator and the permissions are quite loose.
+### TLS 
+Keda uses TLS certificates, and we're managing those TLS assets on our own using cert-manager.
 
-For adapting the RBAC to our clusters, we split it into several pieces:
-- the metrics api server will run under the `service account` [keda-metrics-apiserver](https://github.com/utilitywarehouse/keda-manifests/blob/main/namespaced/metrics-apiserver/rbac.yaml#L2)
-- the operator in each namespace will run under the `service account` [keda-operator](https://github.com/utilitywarehouse/keda-manifests/blob/main/namespaced/operator/rbac.yaml#L2) 
-- the `cluster role` [keda-operator](https://github.com/utilitywarehouse/keda-manifests/blob/main/cluster/operator-role.yaml#L2) should be bound to each `keda-operator` service account for accessing cluster wide resources.  
-- the `role` [keda-operator](https://github.com/utilitywarehouse/keda-manifests/blob/main/namespaced/operator/rbac.yaml#L10) is [bound](https://github.com/utilitywarehouse/keda-manifests/blob/main/namespaced/operator/rbac.yaml#L92) to each `keda-operator` service account for accessing namespaced resources.  
-- the `cluster role` [keda-metrics-apiserver](https://github.com/utilitywarehouse/keda-manifests/blob/main/cluster/metrics-apiserver-role.yaml#L2) is bound to the `keda-metrics-apiserver` service account for accessing cluster wide keda objects.
-- the `cluster role` [keda-external-metrics-reader](https://github.com/utilitywarehouse/keda-manifests/blob/main/cluster/hpa-rbac.yaml#L2) bound to the existing `horizontal-pod-autoscaler` service account for HPA to be able to access external metrics exposed by the keda metrics-apiserver. This is kept as is from the released keda manifests 
+Here are [their docs on this](https://keda.sh/docs/2.16/operate/security/#use-your-own-tls-certificates).
 
-### Secrets limitation
-Using scalers with any means of [authentication through secrets](https://keda.sh/docs/2.7/concepts/authentication/) is `NOT SUPPORTED`. 
+Implementation details:
+- [defined custom cert manager issuer](kube-system/clusterissuer/clusterissuer.yaml). This is the issuer used for all the Keda self-signed certificates.
+- [defined certificate](dev-enablement/metrics-apiserver/certificate.yaml) for metrics-apiserver. The generated secret is [mounted in the pod](https://github.com/utilitywarehouse/keda-manifests/blob/264e3e5d3cf8285f7b2c1e17b1e23141a20c0903/dev-enablement/metrics-apiserver/deployment.yaml#L111-L125). 
+- [defined certificate](dev-enablement/operator/certificate.yaml) for the operator. We're running with [disabled certificate rotation](https://github.com/utilitywarehouse/keda-manifests/blob/264e3e5d3cf8285f7b2c1e17b1e23141a20c0903/dev-enablement/operator/deployment.yaml#L58) and the generated secret is [mounted in the pod](https://github.com/utilitywarehouse/keda-manifests/blob/264e3e5d3cf8285f7b2c1e17b1e23141a20c0903/dev-enablement/operator/deployment.yaml#L108-L123)
+- [defined certificate](kube-system/apiservice/certificate.yaml) for the API Service. The `cabundle` in the API service is set by using the annotation [cert-manager.io/inject-ca-from](https://github.com/utilitywarehouse/keda-manifests/blob/264e3e5d3cf8285f7b2c1e17b1e23141a20c0903/kube-system/apiservice/apiservice.yaml#L6)
 
-#### Explanation
-In its default RBAC configuration, Keda gives `cluster wide access` for its components to `secrets`. 
+### RBAC adjustments 
+[Keda releases](https://github.com/kedacore/keda/releases) include:
+- a `keda-operator` [cluster role](kube-system/rbac/operator-cluster-role.yaml) with cluster wide permissions used for watching over other namespaces. 
+  The permissions in it are quite well curated nowadays, but we went forward and adjusted it more. These adjustments are documented at the beginning of the file.  
+- a slim `keda-operator` [role](dev-enablement/rbac/operator-role.yaml) used for accessing local `dev-enablement` resources. We adjusted this one too documented also at the beginning of the file.
+- a `keda-operator` service account that is bound to these roles. The metrics API server and the operator run under this service account.
 
-This is not acceptable to our cluster setup as it would break our namespace isolation approach, and it would pose a serious security risk.
+Although the metrics API doesn't need all the permissions in these roles, we want to keep the manifests as close as possible to Keda upstream, to have a leaner upgrade experience.
 
-In version 1.7.1, we tried limiting the secrets access to only namespace through a role, but the `keda metrics-apiserver` wants cluster wide access, so this strategy failed.
+### SclaledJobs limitation
+Due to [this bug](https://github.com/kedacore/keda/issues/4740) we currently don't support [scaling jobs](https://keda.sh/docs/2.16/concepts/scaling-jobs/).
 
-#### Workaround
-So far we've been using the kafka & prometheus scalers which don't require authentication.
+We took the scaledjobs.keda.sh Custom Resource Definition out of the manifests.
 
-If you do need a scaler with authentication here are the proposed solutions:
-1. Use a prometheus exporter that exposes the needed metric as a prometheus metric and handles the authentication. After this, just use the prometheus scaler.
-2. Use credentials from HashiCorp Vault through [TriggerAuthentication](https://keda.sh/docs/2.7/concepts/authentication/#re-use-credentials-and-delegate-auth-with-triggerauthentication). This requires more setup as we didn't try it yet.
+If you have a good use case for it please contact us.
+
+### Secrets access
+By default, Keda's RBAC configuration grants `cluster-wide access` to `secrets` for its components.
+
+This approach is incompatible with our cluster setup, as it undermines our namespace isolation strategy and introduces significant security risks. 
+Consequently, we've stripped away this default access. However, we are **not** currently applying [restricted access to secrets](https://keda.sh/docs/2.16/operate/cluster/#restrict-secret-access) in our environment.
+
+To use scalers that require [authentication through secrets](https://keda.sh/docs/2.16/concepts/authentication/), Keda needs access to the used secrets within your namespace. 
+To enable this, please apply the base [keda-ns-secrets-access](/keda-ns-secrets-access) in your namespace and patch through kustomize the role `keda-operator-ns-secrets-access` where you list the secrets used by Keda scalers. 
+Example:
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: keda-operator-ns-secrets-access
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+    resourceNames:
+      - test-keda-secret
+```
 
 ## Upgrade procedure
 Due to the RBAC split, the upgrade is not straight forward.
 
 We used the following procedure:
-1. diff the Keda manifests between [Keda releases](https://github.com/kedacore/keda/releases). Example: keda [v5.1.0](https://github.com/kedacore/keda/releases/download/v2.5.0/keda-2.5.0.yaml) vs [v.2.7.1](https://github.com/kedacore/keda/releases/download/v2.7.1/keda-2.7.1.yaml)
+1. diff the Keda manifests between [Keda releases](https://github.com/kedacore/keda/releases). Example: keda [v2.16.0](https://github.com/kedacore/keda/releases/download/v2.16.0/keda-2.16.0-core.yaml) vs [v.2.16.1](https://github.com/kedacore/keda/releases/download/v2.16.1/keda-2.16.1-core.yaml)
 2. adjust the manifests in this repo, based on the diffs.
-3. test the upgrade in the exp1-merit environment where there are 2 namespaces using it: `billing-keda` and `finance-keda`. 
+3. test the upgrade in the exp1-merit environment where there is the `keda-test` namespace using it. 
 
 Things to check:
 - The metrics-apiserver & operators are running fine. Check the logs for this.

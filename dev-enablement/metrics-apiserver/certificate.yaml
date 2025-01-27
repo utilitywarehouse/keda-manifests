@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: keda-metrics-apiserver
+spec:
+  commonName: keda-metrics-apiserver
+  dnsNames:
+    # Running the operator from the dev-enablement namespace
+    - keda-metrics-apiserver.dev-enablement.svc
+    - keda-metrics-apiserver.dev-enablement.svc.cluster.local
+  duration: 2160h0m0s # 90 days, renews 2/3 of the way through
+  issuerRef:
+    kind: ClusterIssuer
+    name: keda-selfsigned-issuer
+  secretName: keda-metrics-apiserver-cert
