@@ -9,6 +9,7 @@ groups:
         annotations:
           summary: 'Scaled object {{$labels.namespace}}/{{$labels.scaledObject}} is reporting errors. Check the keda-operator logs.'
           dashboard: <https://grafana.$ENVIRONMENT.$PROVIDER.uw.systems/d/asdasd8rvmMxdVk/keda?from=now-1h&to=now&timezone=utc&var-datasource=thanos&var-namespace={{ $labels.namespace }}&var-scaledObject={{ $labels.scaledObject }}&refresh=1m|link>
+          runbook: <https://wiki.uw.systems/posts/keda-runbook-yvrlnaay#keda-scaled-object-error|link>
           priority: P3
       - alert: KedaScalerError
         expr: sum by(namespace, scaler, scaledObject, metric) (increase(keda_scaler_detail_errors_total{}[5m])) > 0
@@ -18,4 +19,5 @@ groups:
         annotations:
           summary: "Scaler {{ $labels.scaler }}:{{ $labels.metric }} of scaled object {{$labels.namespace}}/{{$labels.scaledObject}} is reporting errors. Check the keda-operator logs."
           dashboard: <https://grafana.$ENVIRONMENT.$PROVIDER.uw.systems/d/asdasd8rvmMxdVk/keda?from=now-1h&to=now&timezone=utc&var-datasource=thanos&var-namespace={{ $labels.namespace }}&var-scaledObject={{ $labels.scaledObject }}&refresh=1m|link>
+          runbook: <https://wiki.uw.systems/posts/keda-runbook-yvrlnaay#keda-scaler-error|link>
           priority: P3
