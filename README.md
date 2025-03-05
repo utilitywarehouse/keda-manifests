@@ -2,6 +2,9 @@
 Holds manifests for Keda adapted for UW usage.
 Based on the manifests from [Keda releases](https://github.com/kedacore/keda/releases)
 
+For using Keda, you can checkout [this example
+setup](https://github.com/utilitywarehouse/kubernetes-manifests/tree/master/exp-1-merit/keda-test).
+
 ## Structure
 The high level structure is as follows:
 - `/kube-system` - contains cluster level resources that can only be applied by cluster admins in the kube-system namespace. They must be reviewed by the system team.
