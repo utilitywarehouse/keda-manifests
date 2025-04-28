@@ -16,6 +16,8 @@ spec:
   secretName: keda-selfsigned-ca
   commonName: keda
   isCA: true
+  duration: 4320h # 6 months
+  renewBefore: 2160h # 3 months
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
